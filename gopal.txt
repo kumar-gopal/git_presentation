@@ -6,3 +6,7 @@ this change made by gopal from gopal brance updated by gopal(this is updated by 
 ✅ End
 
 This README reflects real industry Git usage and is safe for production & teams.
+
+
+
+this will create merge conflict (this is intentationally created by gopal branch for leaning purposes)
