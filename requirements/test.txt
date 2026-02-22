@@ -1,0 +1,328 @@
+Below is a **complete, production-ready “Testing Checklist” document** you can directly paste into your internal company docs or Notion.
+
+---
+
+# 📘 **Production Testing Checklist (Functionality, Load, Security)**
+
+**For: Node.js + AWS Deployment**
+**Purpose: Ensure each release is stable, fast, and secure before going live.**
+
+---
+
+# ✅ **1. FUNCTIONALITY TESTING**
+
+## 🔹 **1.1 What is Checked**
+
+* API endpoints return correct data
+* Validation works
+* Authentication & Authorization work
+* CRUD flows work
+* Error responses are correct
+* File upload/download works
+* DB transactions perform as expected
+
+---
+
+## 🔹 **1.2 Tools Used**
+
+| Tool           | Purpose             |
+| -------------- | ------------------- |
+| Jest           | Unit testing        |
+| Supertest      | API testing         |
+| Postman/Newman | Manual + CI testing |
+| Cypress        | End-to-end testing  |
+
+---
+
+## 🔹 **1.3 Steps to Perform**
+
+### **1. Write Unit Tests**
+
+* Test services, utils, DB helpers
+* Mock external API calls
+* Test input validation
+
+**Example**
+
+js
+test("hashPassword returns hashed value", async () => {
+  const hashed = await hash("secret");
+  expect(hashed).not.toBe("secret");
+});
+
+
+---
+
+### **2. Write API Integration Tests (Supertest)**
+
+* Test status codes
+* Test request + response
+* Check authentication
+
+```js
+const request = require("supertest");
+const app = require("../app");
+
+describe("POST /auth/login", () => {
+  it("returns 200 for valid credentials", async () => {
+    const res = await request(app)
+      .post("/auth/login")
+      .send({ email: "test@mail.com", password: "123456" });
+
+    expect(res.statusCode).toBe(200);
+  });
+});
+```
+
+---
+
+### **3. Manual API Tests (Postman)**
+
+Check:
+
+* Success flow
+* Fail flow
+* Incorrect headers
+* Missing token
+* Rate limit behavior
+* File upload size checks
+
+Run in CI with:
+
+```sh
+newman run collection.json
+```
+
+---
+
+## 🔹 **1.4 What to Document**
+
+* List of test cases covered
+* Postman collection
+* Test coverage report
+* Mock data
+* API error response rules
+
+---
+
+---
+
+# 🚀 **2. LOAD / PERFORMANCE TESTING**
+
+## 🔹 **2.1 What is Checked**
+
+* RPS (Requests Per Second)
+* Scalability
+* Slow endpoints
+* Bottle­necks (DB, CPU, memory)
+* Peak traffic handling
+* AWS Auto-scaling behavior
+
+---
+
+## 🔹 **2.2 Tools Used**
+
+| Tool             | Purpose                   |
+| ---------------- | ------------------------- |
+| K6               | Script-based load testing |
+| JMeter           | UI-based load testing     |
+| Apache Benchmark | Quick tests               |
+| CloudWatch       | Monitoring in AWS         |
+
+---
+
+## 🔹 **2.3 Steps to Perform**
+
+### **1. Install K6**
+
+```sh
+sudo apt install k6
+```
+
+---
+
+### **2. Write Load Test Script**
+
+`load-test.js`:
+
+```js
+import http from "k6/http";
+import { sleep } from "k6";
+
+export let options = {
+  vus: 50,           // virtual users
+  duration: "30s",   // test for 30 seconds
+};
+
+export default function () {
+  http.get("https://api.yourdomain.com/health");
+  sleep(1);
+}
+```
+
+---
+
+### **3. Run Load Test**
+
+```sh
+k6 run load-test.js
+```
+
+---
+
+### **4. Monitor AWS**
+
+Monitor:
+
+* CPU, Memory
+* Network In/Out
+* ALB TargetResponseTime
+* Error count
+* DB connections
+* Lambda cold starts (if used)
+
+---
+
+## 🔹 **2.4 What to Document**
+
+* Max RPS backend can handle
+* p95 and p99 latency
+* Failures under load
+* Bottlenecks found
+* Fixes implemented
+* AWS auto-scaling behavior
+
+---
+
+---
+
+# 🔐 **3. SECURITY TESTING**
+
+## 🔹 **3.1 What is Checked**
+
+* Vulnerabilities in dependencies
+* API security
+* Misconfigured headers
+* SSL/TLS configuration
+* Server security
+* Rate limiting
+* Sensitive data exposure
+* Weak authentication
+
+---
+
+## 🔹 **3.2 Tools Used**
+
+| Tool       | Purpose                    |
+| ---------- | -------------------------- |
+| OWASP ZAP  | Security scans             |
+| Nmap       | Port scanning              |
+| Nikto      | Web server testing         |
+| Snyk       | Dependency vulnerabilities |
+| Burp Suite | Penetration testing        |
+| npm audit  | Node package security      |
+
+---
+
+## 🔹 **3.3 Steps to Perform**
+
+### **1. Run Dependency Audit**
+
+```sh
+npm audit fix
+```
+
+---
+
+### **2. Security Header Check (Nginx)**
+
+Check:
+
+* `X-Frame-Options`
+* `X-XSS-Protection`
+* `Content-Security-Policy`
+* `Strict-Transport-Security`
+
+---
+
+### **3. Run OWASP ZAP API Scan**
+
+Look for:
+
+* SQL Injection
+* XSS
+* Broken auth
+* Sensitive data leakage
+* Missing headers
+* IDOR issues
+
+---
+
+### **4. Port Scan with Nmap**
+
+```sh
+nmap -sV your-server-ip
+```
+
+Ensure:
+
+* Only ports **80/443** open
+* DB NOT publicly accessible
+
+---
+
+### **5. Test Authentication Security**
+
+* Invalid token → 401
+* Fake token → 401
+* Expired token → 401
+* Wrong role → 403
+
+---
+
+### **6. Rate Limit Test**
+
+Use K6 or a script to hit one endpoint 1000 times.
+
+Expect response:
+
+```
+429 Too Many Requests
+```
+
+---
+
+## 🔹 **3.4 What to Document**
+
+* Vulnerabilities found
+* Severity classification
+* Fixes applied
+* Server hardening changes
+* SSL test results
+* ZAP report PDF
+
+---
+
+---
+
+# 📄 **Final Summary Cheat Sheet (Put at Top of Docs)**
+
+| Test Type         | Goal                           | Tools                           | Output                |
+| ----------------- | ------------------------------ | ------------------------------- | --------------------- |
+| **Functionality** | Ensure features work           | Jest, Supertest, Postman        | Pass/fail report      |
+| **Load**          | Ensure scaling and performance | K6, JMeter, CloudWatch          | RPS, p95, bottlenecks |
+| **Security**      | Ensure safety                  | OWASP ZAP, Nmap, Snyk, Fail2ban | Risk report & fixes   |
+
+---
+
+# If you want, I can generate:
+
+### ✔️ A **Markdown File (.md)** for documentation
+
+### ✔️ A **Notion-style page**
+
+### ✔️ A **PDF version**
+
+### ✔️ A **Jira task template** for testing workflows
+
+Just tell me **“Generate docs in X format”**.

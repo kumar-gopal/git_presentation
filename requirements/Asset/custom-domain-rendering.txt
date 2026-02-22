@@ -1,0 +1,133 @@
+1.Core Reality (Important Truth)
+
+        S3 keys NEVER change based on domain.
+        Domains are ONLY a CloudFront concern.
+
+
+2️⃣ What Changes When You Have Multiple Domains?
+  Example future domains
+
+| Storefront    | Domain               |
+| ------------- | -------------------- |
+| Nike store    | `nike.axesell.com`   |
+| Adidas store  | `adidas.axesell.com` |
+| Custom domain | `www.nikestore.com`  |
+
+
+What you want
+    https://nike.axesell.com/products/air-max.png
+    https://www.nikestore.com/products/air-max.png
+
+BUT the file should still come from:
+    assets/tenants/nike/products/air-max.png
+
+✅ CORRECT approach (Shopify-style)
+    One S3 bucket
+    One canonical storage key
+    Multiple domains mapped at CDN level
+    Rewrite URLs at the edge
+
+4️⃣ How Multi-Domain Asset Rendering Actually Works
+    Browser (storefront domain)
+            ↓
+    CloudFront (host-aware rewrite)
+            ↓
+    S3 (same storage key)
+The domain only changes how CloudFront rewrites the URL, not where the file lives.
+
+5️⃣ Two Proven Ways to Support Multiple Domains
+✅ Option A — One CDN Domain (Simplest, Recommended)
+    All storefronts use one asset domain:
+✅ Option B — Branded Asset Domains (Advanced, Optional)
+    Each storefront has its own asset domain:
+    assets.nikestore.com
+    assets.adidas.com
+
+Internally:
+
+All point to the same CloudFront distribution
+    Same S3 bucket
+    Same rewrite function
+    Only difference is Host header.
+
+ SAFE Host-Based CloudFront Function (FINAL)
+✅ Production-ready CloudFront Function
+
+function handler(event) {
+  var request = event.request;
+  var uri = request.uri;
+  var host = request.headers.host.value.toLowerCase();
+
+  // DOMAIN → TENANT mapping (safe, static)
+  var DOMAIN_TENANT_MAP = {
+    "nike.axesell.com": "nike",
+    "www.nikestore.com": "nike",
+    "adidas.axesell.com": "adidas"
+  };
+
+  // Platform assets still work
+  if (uri.startsWith("/p/")) {
+    request.uri = uri.replace(/^\/p\//, "/assets/platform/global/");
+    return request;
+  }
+
+  // Host-based tenant rewrite
+  var storeSlug = DOMAIN_TENANT_MAP[host];
+
+  if (storeSlug) {
+    // Example:
+    // /products/air-max.png
+    // → /assets/tenants/nike/products/air-max.png
+    request.uri = "/assets/tenants/" + storeSlug + uri;
+    return request;
+  }
+
+  // Fallback (important for safety)
+  return request;
+}
+
+
+function handler(event) {
+  var request = event.request;
+  var uri = request.uri;
+  var host = request.headers.host.value.toLowerCase();
+
+  var DOMAIN_TENANT_MAP = {
+    "nike.axesell.com": "nike",
+    "www.nikestore.com": "nike",
+    "adidas.axesell.com": "adidas"
+  };
+
+  // Platform assets
+  if (uri.startsWith("/p/")) {
+    request.uri = uri.replace(/^\/p\//, "/assets/platform/global/");
+    return request;
+  }
+
+  // Explicit tenant assets
+  if (uri.startsWith("/s/")) {
+    request.uri = uri.replace(/^\/s\//, "/assets/tenants/");
+    return request;
+  }
+
+  // Host-based tenant assets
+  var storeSlug = DOMAIN_TENANT_MAP[host];
+  if (storeSlug) {
+    request.uri = "/assets/tenants/" + storeSlug + uri;
+    return request;
+  }
+
+  return request;
+}
+
+
+this function will attach in CloudFront behaviors
+and add in alternate domain option 
+
+generate acm cert for .axesell.com 
+and attach in CloudFront section and add all domain in alternate domain section 
+
+
+for custom domain 
+  need to create acm cert for each 
+  and map domain 

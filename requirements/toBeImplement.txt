@@ -1,0 +1,82 @@
+# 1. To be implemented access_token and refresh_token in both users and(end-user) admin(tenant(store)).  ✅
+
+# 2. For refresh token make a schema   ✅
+
+# 2. To be protected backend api key via header  ✅
+
+# 3. For notification make a schema and store all type notification just notification services  ✅
+
+# 4. After sending notification also have to update status (sent,failed)  ✅
+
+# 5. Have to set auto expired in coupon model and discount model as well  ✅
+
+# 6. Separate the Address model {GOOD TO HAVE}  ✅
+
+# 7. To implement Rate limiting for all routes and protect from DDOS attack and abuses of api calls  ✅
+
+# 8. To be implement caching for all payload hauvy api call  
+
+# 9. To be implement CDN (save rending assest/images/videos from backend)  ✅
+
+# 10. For uplloading Assest(images/vidoes) uses cloudinary or AWS S3 buckets  ✅
+
+# 11. Assets upload should be streaming (chunk/bytes)  ✅
+
+# 12. Implemte RBAC FOR Permissions (authorize) for all routing based on role and permission can performa task also set rate limiting (to limit the api calls )  ✅
+
+# 13. Have to check all routes is correct format and follow production grade and match industry standard 
+
+# 14. Optimize logic of get date ,month and year (helpers/dataHelpers)  
+
+# 15. Have to optimize api and make DRY AND Efficient
+
+# 16. To be optimize database query 
+
+# 17. Implement proper indexing in each schema and also convert query into aggregation pipeline for better latency 
+
+# 18. To be implemented dyanmically cors policy for each tenant 
+
+# 19. Convert all variable into contants variable to use amywhere in the code.
+
+# 20. Implement Api Testing using (jest/chai/mocha) so that run on ci & cd pipeline before going to deploy on server
+
+# 21  Deployment using docker (Must have )
+
+# 22. Kubernetes (GOOD TO HAVE).
+
+# 23. To be implemente CI & CD pipeline
+# 24. store logs on s3 from local machine
+
+........... and so on... 
+
+# ***************************  new features   *************************
+
+# 1. after uploaded images convert in webP and avif format using lamda function 
+
+# 2. for reducing expenses of cf ---> enable caching for all statics file (images) 
+This behavior caches ALL assets inside /tenants/ folder.
+Origin: gopals3 (S3 with OAC)
+Allowed Methods: GET, HEAD
+Cache Policy: Custom_Long_TTL (details below)
+Origin Request Policy: None
+Viewer Protocol Policy: Redirect HTTP to HTTPS
+Compress Objects Automatically: YES
+
+ Create a Cache Policy named: - LongTermAssetsCaching
+ ymlformat - TTL:
+- Minimum TTL: 3600 (1 hour)
+- Default TTL: 86400 (1 day)
+- Maximum TTL: 31536000 (1 year)
+
+Headers: None
+Query Strings: None
+Cookies: None
+Compression: Brotli + GZIP enabled
+
+const cmd = new PutObjectCommand({
+  Bucket: "gopals3",
+  Key: key,
+  ContentType: f.mimeType,
+  CacheControl: "public, max-age=31536000, immutable"
+});
+

@@ -1,0 +1,265 @@
+# 🚀 **PRODUCTION DEPLOYMENT CHECKLIST**
+
+### **Backend + VPS + AWS + Node.js + Nginx + PM2**
+
+## 🧱 **1. SERVER BASE SECURITY (Mandatory)**
+
+### ✔️ SSH Hardening
+
+* [ ] Disable root login
+* [ ] Change SSH port (optional but recommended)
+* [ ] Disable password login (SSH keys only)
+* [ ] Limit SSH access to your IP (AWS SG or UFW)
+* [ ] Fail2ban installed & configured
+* [ ] Automatic security updates enabled
+
+### ✔️ System User & Permissions
+
+* [ ] Create non-root user (“ubuntu” or “deploy”)
+* [ ] App runs under a non-root user
+* [ ] File permissions restricted (no `777`)
+
+---
+
+## 🔥 **2. FIREWALL CONFIGURATION**
+
+### ✔️ VPS Firewall (UFW)
+
+* [ ] Allow: 22 / 80 / 443
+* [ ] Deny all other ports
+* [ ] Enable UFW logging
+
+### ✔️ AWS Security Groups
+
+* [ ] Port 22 — “My IP” only
+* [ ] Port 80/443 — open to public
+* [ ] No database ports open to world
+* [ ] No 0.0.0.0/0 for sensitive ports
+
+---
+
+## 🗝️ **3. ENVIRONMENT VARIABLES & SECRET MANAGEMENT**
+
+### ✔️ Secrets Storage
+
+* [ ] `.env` stored OUTSIDE project
+
+  * Recommended: `/etc/myapp/.env`
+* [ ] App loads env through systemd `EnvironmentFile`
+* [ ] `.env` added to `.gitignore`
+* [ ] No secrets in logs
+
+### ✔️ AWS Best Practice
+
+* [ ] Use AWS SSM Parameter Store or Secrets Manager
+* [ ] Rotate keys periodically
+
+---
+
+## ⚙️ **4. APP PROCESS MANAGEMENT (Node.js)**
+
+### ✔️ PM2 Setup
+
+* [ ] App running via PM2
+* [ ] `pm2 save` executed
+* [ ] PM2 startup configured
+* [ ] PM2 cluster mode enabled (`max` cores if required)
+
+### ✔️ systemd (Recommended)
+
+* [ ] PM2 supervised by a systemd service
+* [ ] Allows auto-start even after full system reboot
+* [ ] Provides OS-level hardening & sandbox
+
+---
+
+## 🌐 **5. NGINX REVERSE PROXY CONFIG**
+
+### ✔️ Proxy Setup
+
+* [ ] Nginx → Node.js reverse proxy configured
+* [ ] `proxy_set_header X-Forwarded-For` added
+* [ ] `proxy_set_header Host` added
+* [ ] Websockets configured if needed
+
+### ✔️ Rate Limiting
+
+* [ ] `limit_req_zone` enabled
+* [ ] Protection from brute force & DDoS
+
+### ✔️ Upload Limits
+
+* [ ] `client_max_body_size` set (recommended 20–50MB)
+
+### ✔️ Disable Direct Server Access
+
+* [ ] Node.js port (4000/5000) NOT publicly accessible
+* [ ] Only Nginx exposed
+
+---
+
+## 🔐 **6. HTTPS / SSL CONFIG**
+
+### ✔️ SSL Certificate
+
+* [ ] Let’s Encrypt installed (`certbot`)
+* [ ] Auto-renew cron job active
+
+### ✔️ Force HTTPS
+
+* [ ] HTTP → HTTPS redirect configured
+
+### ✔️ Security Headers
+
+* [ ] `Strict-Transport-Security`
+* [ ] `X-Frame-Options`
+* [ ] `X-Content-Type-Options`
+* [ ] `Referrer-Policy`
+* [ ] `Content-Security-Policy`
+
+---
+
+## ⚡ **7. PERFORMANCE & SCALABILITY**
+
+### ✔️ Node.js
+
+* [ ] PM2 cluster mode (`pm2 start app.js -i max`)
+* [ ] Worker threads / job queues for heavy tasks
+* [ ] Proper pagination for large API responses
+
+### ✔️ System Resource Limits
+
+* [ ] `LimitNOFILE=65535` (prevent EMFILE error)
+* [ ] `vm.max_map_count` adjusted (if needed)
+* [ ] Swap configured (if small RAM machine)
+
+---
+
+## 📝 **8. LOGGING & MONITORING**
+
+### ✔️ Logging
+
+* [ ] Use Winston/Pino logger
+* [ ] No sensitive info in logs
+* [ ] Separate error.log and access.log
+* [ ] Log rotation enabled (`logrotate`)
+
+### ✔️ Monitoring
+
+* [ ] `pm2 monit`
+* [ ] `journalctl -u app.service`
+* [ ] CloudWatch or Grafana optional
+
+---
+
+## 🔧 **9. DATABASE SECURITY**
+
+### ✔️ Access Control
+
+* [ ] DB accessible ONLY from backend server
+* [ ] Disable remote DB access
+* [ ] Strong username/password
+* [ ] Use SSL (if DB supports it)
+
+### ✔️ Backups
+
+* [ ] Daily backups configured
+* [ ] Point-in-time recovery enabled (AWS RDS)
+
+### ✔️ Indexes & Performance
+
+* [ ] Critical queries indexed
+* [ ] Slow queries logged
+* [ ] Aggregations optimized
+
+---
+
+## 📦 **🔟 DEPLOYMENT PIPELINE**
+
+### ✔️ CI/CD
+
+* [ ] Automated GitHub Actions pipeline
+* [ ] Code linted before deployment
+* [ ] Tests executed
+* [ ] Zero-downtime deploy (PM2 reload)
+
+### ✔️ Deployment Steps
+
+* [ ] Pull latest code
+* [ ] Install dependencies
+* [ ] Run build
+* [ ] Restart backend using PM2/systemd
+
+---
+
+## ☁️ **1️⃣1️⃣ AWS / CLOUD-SPECIFIC ITEMS**
+
+### ✔️ EC2
+
+* [ ] Security groups locked down
+* [ ] IAM roles (no access key stored on EC2)
+* [ ] EBS volume auto-snapshot
+
+### ✔️ S3
+
+* [ ] Bucket private
+* [ ] CloudFront required for public content
+* [ ] Signed URLs if needed
+
+### ✔️ CloudFront
+
+* [ ] Caching rules
+* [ ] WAF rules (bot protection, rate limits)
+
+---
+
+## 🧪 **1️⃣2️⃣ TESTING BEFORE DEPLOYMENT**
+
+### ✔️ Functionality
+
+* [ ] All API endpoints tested
+* [ ] Authentication & authorization tested
+* [ ] Database queries optimized
+
+### ✔️ Load Testing
+
+* [ ] k6 / Locust load test
+* [ ] Ensure backend handles expected traffic
+
+### ✔️ Security Testing
+
+* [ ] SQL injection checks
+* [ ] XSS checks
+* [ ] CSRF protection verified
+
+---
+
+# 🎯 **FINAL READY-TO-DEPLOY CHECKLIST SUMMARY**
+
+### **Infrastructure**
+
+* [ ] Server secured
+* [ ] Firewall configured
+* [ ] systemd + PM2 setup
+* [ ] Nginx reverse proxy
+* [ ] SSL configured
+
+### **Application**
+
+* [ ] Environment variables secured
+* [ ] Code optimized
+* [ ] Logs & monitoring ready
+* [ ] DB secured & optimized
+
+### **Deployment**
+
+* [ ] CI/CD live
+* [ ] Zero downtime guaranteed
+* [ ] Automated backups enabled
+
+
+Extra: Put EC2 in private subnet and access via:
+
+Bastion host in public subnet OR
+
+AWS SSM Session Manager (no SSH port open at all – very clean).

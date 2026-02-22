@@ -1,0 +1,33 @@
+Step 1: Create /etc/nginx/allowlist.conf
+sudo nano /etc/nginx/allowlist.conf
+Paste this:
+# Localhost
+allow 127.0.0.1;
+
+# VPC CIDR (example)
+allow 10.0.0.0/8;
+
+# Custom IP allow list (ARRAY style)
+allow 43.251.221.10;
+allow 122.176.44.29;
+allow 52.95.245.40;
+allow 3.108.120.55;
+# Add more as needed...
+
+
+location /internal/ {
+    include /etc/nginx/allowlist.conf;  # allowed IPs
+    deny all;                           # block everything else
+
+    proxy_pass http://127.0.0.1:5000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+}
+
+Reload Nginx safely
+sudo nginx -t
+sudo systemctl reload nginx
+
+How to add IP using script
+echo "allow <IP>;" | sudo tee -a /etc/nginx/allowlist.conf
+sudo nginx -t && sudo systemctl reload nginx

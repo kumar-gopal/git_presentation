@@ -1,0 +1,75 @@
+1.Check real-time Fail2ban logs
+sudo tail -f /var/log/fail2ban.log
+
+
+2.Check last 200 lines
+sudo tail -n 200 /var/log/fail2ban.log
+
+3.Check Fail2ban service status
+sudo systemctl status fail2ban
+
+
+4.List all running jails
+sudo fail2ban-client status
+
+5.Check logs for a specific jail
+sudo fail2ban-client status sshd
+sudo fail2ban-client status nginx-404
+
+
+6.See all banned IPs
+sudo fail2ban-client banned
+
+
+7.See banned IPs for specific jail
+sudo fail2ban-client status sshd
+
+8.Unban an IP
+sudo fail2ban-client set sshd unbanip <IP>
+
+9.Real-time Postfix logs
+sudo tail -f /var/log/mail.log
+Last 200 lines
+sudo tail -n 200 /var/log/mail.log
+
+10.Check if Postfix is running
+sudo systemctl status postfix
+
+
+11.Check system logs
+sudo journalctl -xe
+
+
+12.Check firewall / iptables
+sudo iptables -L -n
+
+13.Check firewall / iptables
+sudo iptables -L -n
+
+14.Check if EC2 blocks port 25
+
+AWS BLOCKS port 25 by default.
+
+telnet gmail-smtp-in.l.google.com 25
+
+
+*******************.✅ 5. Nginx Logs (Fail2ban Reads These)****************
+1.Access log
+sudo tail -f /var/log/nginx/access.log
+
+2.Error log
+sudo tail -f /var/log/nginx/error.log
+
+
+***************Fail2ban Configuration Paths***********
+1.Main config
+/etc/fail2ban/fail2ban.conf
+
+2.Jail configuration
+/etc/fail2ban/jail.local
+
+3.Filter definitions
+/etc/fail2ban/filter.d/
+
+
+

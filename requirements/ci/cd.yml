@@ -1,0 +1,291 @@
+# deploy.yml
+name: Deploy to aws
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Prepare Deployment Package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.13.1"
+          cache: "pnpm"
+
+      - name: Install production dependencies
+        run: pnpm install --prod
+
+      - name: Create deployment package
+        run: |
+          mkdir -p deploy
+          rsync -av ./ deploy \
+            --exclude node_modules \
+            --exclude .git \
+            --exclude .github \
+            --exclude backups \
+            --exclude logs \
+            --exclude '*.log' \
+            --exclude '*.tar.gz' \
+            --exclude '.env*'
+          
+          find deploy -maxdepth 1 -name ".env*" -delete || true
+          tar -czf deploy.tar.gz -C deploy .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-package
+          path: deploy.tar.gz
+          retention-days: 1
+
+      - name: Backup deployment to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          S3_BACKUP_BUCKET: ${{ secrets.S3_BACKUP_BUCKET }}
+        run: |
+          timestamp=$(date +%Y%m%d_%H%M%S)
+          aws s3 cp deploy.tar.gz s3://$S3_BACKUP_BUCKET/deploy_$timestamp.tar.gz
+
+
+
+
+  deploy:
+    name: Deploy to EC2
+    needs: build
+    runs-on: ubuntu-latest
+
+    env:
+      EC2_HOST: ${{ secrets.EC2_HOST }}
+      EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: deployment-package
+
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Deploy to EC2
+        run: |
+          scp -o StrictHostKeyChecking=no deploy.tar.gz ${EC2_USERNAME}@${EC2_HOST}:/tmp/
+
+          ssh -T -o StrictHostKeyChecking=no ${EC2_USERNAME}@${EC2_HOST} << 'EOF'
+          set -e
+
+          cd /var/www/mybackend
+          sudo chown -R ubuntu:ubuntu /var/www/mybackend
+
+          # ---------- FIXED: Backup OUTSIDE project ----------
+          sudo mkdir -p /var/backups/mybackend
+          timestamp=$(date +%Y%m%d_%H%M%S)
+
+          echo "Creating LOCAL rollback backup..."
+          sudo tar --exclude='/var/www/mybackend/node_modules' \
+                   --exclude='/var/www/mybackend/logs' \
+                   -czf /var/backups/mybackend/app_$timestamp.tar.gz \
+                   /var/www/mybackend
+
+          # keep last 5 backups
+          ls -t /var/backups/mybackend/app_*.tar.gz | tail -n +6 | xargs -r rm || true
+
+          echo "Extracting new version..."
+          tar --overwrite -xzf /tmp/deploy.tar.gz -C /var/www/mybackend
+          rm /tmp/deploy.tar.gz
+
+          pnpm install --prod --prefer-offline
+          mkdir -p logs
+
+          if pm2 describe axesellbackend > /dev/null 2>&1; then
+            pm2 reload ecosystem.config.cjs 
+          else
+            pm2 start ecosystem.config.cjs
+          fi
+
+          pm2 save
+          EOF
+
+      - name: Verify /health
+        run: |
+          sleep 8
+          for i in {1..5}; do
+            status=$(curl -s -o /dev/null -w "%{http_code}" http://${EC2_HOST}/health || echo "000")
+            if [ "$status" = "200" ]; then exit 0; fi
+            sleep 5
+          done
+          exit 1
+
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          ssh -T -o StrictHostKeyChecking=no ${EC2_USERNAME}@${EC2_HOST} << 'EOF'
+          set -e
+          cd /var/www/mybackend
+
+          echo "Checking LOCAL rollback backup..."
+
+          # ------ FIXED: Read backup from /var/backups/mybackend ------
+          local_backup=$(ls -t /var/backups/mybackend/app_*.tar.gz | head -1 || true)
+
+          if [ -n "$local_backup" ]; then
+            tar -xzf "$local_backup" -C /
+            pnpm install --prod --prefer-offline
+            pm2 reload ecosystem.config.cjs || pm2 start ecosystem.config.cjs
+            pm2 save
+            exit 0
+          fi
+
+          echo "❌ No rollback available"
+          exit 1
+          EOF
+
+
+
+
+# security.yml
+name: Security Scan
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+
+  gitleaks:
+    name: Scan for Secrets (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Gitleaks
+        uses: zricethezav/gitleaks-action@v2
+        with:
+          args: "--no-banner --redact"
+
+  npm_audit:
+    name: NPM Audit (High severity fails)
+    runs-on: ubuntu-latest
+    needs: gitleaks
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install --omit=dev
+      - run: |
+          npm audit --json > audit.json
+          if grep -q '"severity":"high"\|"severity":"critical"' audit.json; then
+            exit 1
+          fi
+
+  eslint_security:
+    name: ESLint Security Scan
+    runs-on: ubuntu-latest
+    needs: npm_audit
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install
+      - run: npx eslint . --config .eslintrc.security.cjs
+
+  semgrep:
+    name: Semgrep SAST Scan
+    runs-on: ubuntu-latest
+    needs: eslint_security
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Semgrep (custom rules)
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: semgrep/semgrep.config.yml
+          generateSarif: "true"
+          output: semgrep.sarif
+
+      - name: Upload SARIF report
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+
+  codeql:
+    name: CodeQL (Enterprise SAST)
+    runs-on: ubuntu-latest
+    needs: semgrep
+
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with: { languages: javascript }
+      - uses: github/codeql-action/autobuild@v3
+      - uses: github/codeql-action/analyze@v3
+
+  dependency_review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    needs: codeql
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/dependency-review-action@v4
+        with: { fail-on-severity: high }
+
+  security_pipeline:
+    name: Security Pipeline Final Gate
+    runs-on: ubuntu-latest
+    needs:
+      - gitleaks
+      - npm_audit
+      - eslint_security
+      - semgrep
+      - codeql
+      - dependency_review
+    steps:
+      - run: echo "✔ Security pipeline finished successfully"
+
+
+# ci-cd.yml 
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+
+  security:
+    name: Run Security Pipeline
+    uses: ./.github/workflows/security.yml
+
+  deploy:
+    name: Run Deployment Pipeline
+    needs: security
+    if: github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
