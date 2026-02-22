@@ -1,0 +1,713 @@
+{
+	"info": {
+		"_postman_id": "901b6274-188d-4894-bcb0-3cabc527d724",
+		"name": "product",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49039880"
+	},
+	"item": [
+		{
+			"name": "draf",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{axesell_local}}/api/admins/stores/products/draft",
+					"host": [
+						"{{axesell_local}}"
+					],
+					"path": [
+						"api",
+						"admins",
+						"stores",
+						"products",
+						"draft"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "⭐ STEP-1: Basic Info",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"productId\": \"66f482a81c3a77044f17b111\",        // optional for update\n  \"title\": \"iPhone 14 Pro Max\",\n  \"slug\": \"iphone-14-pro-max\",\n  \"categoryId\": \"66f47f50a66a118f18c1ba32\",\n  \"brandId\": \"66cddf88ef0cde3d40947e26\",\n  \"productType\": \"Variant\",                        // Single | Variant\n  \"skuCode\": \"APL-IP14-PM\",\n  \"hsnCode\": \"85171290\",\n  \"gst\": 18,\n  \"unit\": \"pcs\",\n  \"publishDate\": \"2025-02-01\",\n  \"thumbnail\": \"s3://bucket/products/iphone.jpg\",\n  \"isFeatured\": true,\n  \"isTrending\": false\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{axesell_local}}/api/admins/stores/products/basic-info",
+					"host": [
+						"{{axesell_local}}"
+					],
+					"path": [
+						"api",
+						"admins",
+						"stores",
+						"products",
+						"basic-info"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "⭐ STEP-1: Basic Info",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"productId\": \"66f482a81c3a77044f17b111\",        // optional for update\n  \"title\": \"iPhone 14 Pro Max\",\n  \"slug\": \"iphone-14-pro-max\",\n  \"categoryId\": \"66f47f50a66a118f18c1ba32\",\n  \"brandId\": \"66cddf88ef0cde3d40947e26\",\n  \"productType\": \"Variant\",                        // Single | Variant\n  \"skuCode\": \"APL-IP14-PM\",\n  \"hsnCode\": \"85171290\",\n  \"gst\": 18,\n  \"unit\": \"pcs\",\n  \"publishDate\": \"2025-02-01\",\n  \"thumbnail\": \"s3://bucket/products/iphone.jpg\",\n  \"isFeatured\": true,\n  \"isTrending\": false\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{axesell_local}}/api/admins/stores/products/:id/basic-info",
+					"host": [
+						"{{axesell_local}}"
+					],
+					"path": [
+						"api",
+						"admins",
+						"stores",
+						"products",
+						":id",
+						"basic-info"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "⭐ STEP-2A: Single Pricing",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"costPrice\": 95000,\n  \"mrp\": 110000,\n  \"price\": 99999,\n  \"discount\": 10,\n  \"availableStock\": 25,\n  \"alertQuantity\": 2\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{axesell_local}}/api/admins/stores/products/:id/pricing",
+					"host": [
+						"{{axesell_local}}"
+					],
+					"path": [
+						"api",
+						"admins",
+						"stores",
+						"products",
+						":id",
+						"pricing"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "⭐ STEP-2A: Single Pricing",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{axesell_local}}/api/admins/stores/products/:id/pricing",
+					"host": [
+						"{{axesell_local}}"
+					],
+					"path": [
+						"api",
+						"admins",
+						"stores",
+						"products",
+						":id",
+						"pricing"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "STEP-2B: Variant Pricing",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"variants\": [\n    {\n      \"name\": \"128GB Black\",\n      \"sku\": \"APL-IP14-128-BLK\",\n      \"costPrice\": 90000,\n      \"mrp\": 105000,\n      \"price\": 97999,\n      \"discount\": 5,\n      \"quantity\": 50,\n      \"alertQuantity\": 5,\n      \"description\": \"Black variant 128GB\",\n      \"attributes\": {\n        \"color\": \"Black\",\n        \"storage\": \"128GB\"\n      },\n      \"keepImages\": [\n        \"s3://bucket/products/var1-img1.jpg\"\n      ]\n    },\n    {\n      \"name\": \"256GB Purple\",\n      \"sku\": \"APL-IP14-256-PUR\",\n      \"costPrice\": 95000,\n      \"mrp\": 115000,\n      \"price\": 108999,\n      \"discount\": 5,\n      \"quantity\": 20,\n      \"alertQuantity\": 2,\n      \"attributes\": {\n        \"color\": \"Purple\",\n        \"storage\": \"256GB\"\n      }\n    }\n  ]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{axesell_local}}/api/admins/stores/products/:id/variants",
+					"host": [
+						"{{axesell_local}}"
+					],
+					"path": [
+						"api",
+						"admins",
+						"stores",
+						"products",
+						":id",
+						"variants"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "STEP-2B: Variant Pricing",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"variants\": [\n    {\n      \"name\": \"128GB Black\",\n      \"sku\": \"APL-IP14-128-BLK\",\n      \"costPrice\": 90000,\n      \"mrp\": 105000,\n      \"price\": 97999,\n      \"discount\": 5,\n      \"quantity\": 50,\n      \"alertQuantity\": 5,\n      \"description\": \"Black variant 128GB\",\n      \"attributes\": {\n        \"color\": \"Black\",\n        \"storage\": \"128GB\"\n      },\n      \"keepImages\": [\n        \"s3://bucket/products/var1-img1.jpg\"\n      ]\n    },\n    {\n      \"name\": \"256GB Purple\",\n      \"sku\": \"APL-IP14-256-PUR\",\n      \"costPrice\": 95000,\n      \"mrp\": 115000,\n      \"price\": 108999,\n      \"discount\": 5,\n      \"quantity\": 20,\n      \"alertQuantity\": 2,\n      \"attributes\": {\n        \"color\": \"Purple\",\n        \"storage\": \"256GB\"\n      }\n    }\n  ]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{axesell_local}}/api/admins/stores/products/:id/variants",
+					"host": [
+						"{{axesell_local}}"
+					],
+					"path": [
+						"api",
+						"admins",
+						"stores",
+						"products",
+						":id",
+						"variants"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete variant",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"variants\": [\n    {\n      \"name\": \"128GB Black\",\n      \"sku\": \"APL-IP14-128-BLK\",\n      \"costPrice\": 90000,\n      \"mrp\": 105000,\n      \"price\": 97999,\n      \"discount\": 5,\n      \"quantity\": 50,\n      \"alertQuantity\": 5,\n      \"description\": \"Black variant 128GB\",\n      \"attributes\": {\n        \"color\": \"Black\",\n        \"storage\": \"128GB\"\n      },\n      \"keepImages\": [\n        \"s3://bucket/products/var1-img1.jpg\"\n      ]\n    },\n    {\n      \"name\": \"256GB Purple\",\n      \"sku\": \"APL-IP14-256-PUR\",\n      \"costPrice\": 95000,\n      \"mrp\": 115000,\n      \"price\": 108999,\n      \"discount\": 5,\n      \"quantity\": 20,\n      \"alertQuantity\": 2,\n      \"attributes\": {\n        \"color\": \"Purple\",\n        \"storage\": \"256GB\"\n      }\n    }\n  ]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{axesell_local}}/api/admins/stores/products/:id/variants/:sku",
+					"host": [
+						"{{axesell_local}}"
+					],
+					"path": [
+						"api",
+						"admins",
+						"stores",
+						"products",
+						":id",
+						"variants",
+						":sku"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						},
+						{
+							"key": "sku",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Desciption",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"description\": \"iPhone 14 is the latest premium smartphone...\",\n  \"shortDescription\": \"Premium Apple flagship\",\n  \"metaTitle\": \"Apple iPhone 14 Price\",\n  \"metaDescription\": \"Buy iPhone 14 Online at Best Price\",\n  \"tags\": [\"apple\", \"iphone\", \"mobile\"],\n  \"keyFeatures\": [\n    \"A16 Bionic Chip\",\n    \"120Hz ProMotion Display\",\n    \"48MP Camera\",\n    \"6GB RAM\"\n  ]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{axesell_local}}/api/admins/stores/products/:id/description",
+					"host": [
+						"{{axesell_local}}"
+					],
+					"path": [
+						"api",
+						"admins",
+						"stores",
+						"products",
+						":id",
+						"description"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Desciption",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"description\": \"iPhone 14 is the latest premium smartphone...\",\n  \"shortDescription\": \"Premium Apple flagship\",\n  \"metaTitle\": \"Apple iPhone 14 Price\",\n  \"metaDescription\": \"Buy iPhone 14 Online at Best Price\",\n  \"tags\": [\"apple\", \"iphone\", \"mobile\"],\n  \"keyFeatures\": [\n    \"A16 Bionic Chip\",\n    \"120Hz ProMotion Display\",\n    \"48MP Camera\",\n    \"6GB RAM\"\n  ]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{axesell_local}}/api/admins/stores/products/:id/description",
+					"host": [
+						"{{axesell_local}}"
+					],
+					"path": [
+						"api",
+						"admins",
+						"stores",
+						"products",
+						":id",
+						"description"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Media",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"images\": [\n    \"products/iphone14/front.jpg\",\n    \"products/iphone14/back.jpg\"\n  ],\n  \"videos\": [\n    \"videos/iphone14/unboxing.mp4\"\n  ],\n  \"youtubeUrls\": [\n    \"https://youtube.com/watch?v=xyz123\"\n  ]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{axesell_local}}/api/admins/stores/products/:id/media",
+					"host": [
+						"{{axesell_local}}"
+					],
+					"path": [
+						"api",
+						"admins",
+						"stores",
+						"products",
+						":id",
+						"media"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Media",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"images\": [\n    \"products/iphone14/front.jpg\",\n    \"products/iphone14/back.jpg\"\n  ],\n  \"videos\": [\n    \"videos/iphone14/unboxing.mp4\"\n  ],\n  \"youtubeUrls\": [\n    \"https://youtube.com/watch?v=xyz123\"\n  ]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{axesell_local}}/api/admins/stores/products/:id/media",
+					"host": [
+						"{{axesell_local}}"
+					],
+					"path": [
+						"api",
+						"admins",
+						"stores",
+						"products",
+						":id",
+						"media"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Re-view",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"images\": [\n    \"products/iphone14/front.jpg\",\n    \"products/iphone14/back.jpg\"\n  ],\n  \"videos\": [\n    \"videos/iphone14/unboxing.mp4\"\n  ],\n  \"youtubeUrls\": [\n    \"https://youtube.com/watch?v=xyz123\"\n  ]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{axesell_local}}/api/admins/stores/products/:id/revirew",
+					"host": [
+						"{{axesell_local}}"
+					],
+					"path": [
+						"api",
+						"admins",
+						"stores",
+						"products",
+						":id",
+						"revirew"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "publish",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"images\": [\n    \"products/iphone14/front.jpg\",\n    \"products/iphone14/back.jpg\"\n  ],\n  \"videos\": [\n    \"videos/iphone14/unboxing.mp4\"\n  ],\n  \"youtubeUrls\": [\n    \"https://youtube.com/watch?v=xyz123\"\n  ]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{axesell_local}}/api/admins/stores/products/:id/publish",
+					"host": [
+						"{{axesell_local}}"
+					],
+					"path": [
+						"api",
+						"admins",
+						"stores",
+						"products",
+						":id",
+						"publish"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "product list",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"images\": [\n    \"products/iphone14/front.jpg\",\n    \"products/iphone14/back.jpg\"\n  ],\n  \"videos\": [\n    \"videos/iphone14/unboxing.mp4\"\n  ],\n  \"youtubeUrls\": [\n    \"https://youtube.com/watch?v=xyz123\"\n  ]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{axesell_local}}/api/admins/products?page=1&limit=10&search=iphone",
+					"host": [
+						"{{axesell_local}}"
+					],
+					"path": [
+						"api",
+						"admins",
+						"products"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "10"
+						},
+						{
+							"key": "search",
+							"value": "iphone"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
